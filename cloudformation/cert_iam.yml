@@ -1,0 +1,99 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >
+  IAM ROLE for Lamda to auto-rotate Let's Encrypt ssl certificates
+
+###############################################################################
+Parameters:
+###############################################################################
+
+  Region:
+    Type: String
+    Description: The Region To Deploy To
+  AWSAccount:
+    Type: String
+    Description: The account ID this will be deployed in
+  HostedZoneID:
+    Description: 'The ID of your hosted zone in Route 53'
+    Type: 'AWS::Route53::HostedZone::Id'     
+  PrivateBucket:
+    Type: String
+    Description: The Bucket to hold our certificate
+  CertLambaRoleName:
+    Type: String
+    Description: The name to use for the Lambda Role
+  
+
+###############################################################################
+Resources:
+###############################################################################
+
+  CertUpdateLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Ref CertLambdaRolename
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        - PolicyName: cert-lambda-execute-role
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+            - Effect: Allow
+              Action:
+                - "logs:CreateLogGroup"
+              Resource: !Sub "arn:aws:logs:${Region}:${AWSAccount}:*"
+            - Effect: Allow
+              Action:
+                - "logs:PutLogEvents"
+                - "logs:CreateLogStream"
+              Resource: "arn:aws:logs:${Region}:${AWSAccount}:log-group:/aws/lambda/acme-dns-route53:*"
+            - Effect: Allow
+              Action:
+                - "route53:ListHostedZones"
+                - "acm:ImportCertificate"
+                - "acm:ListCertificates"
+                - "cloudwatch:PutMetricData"
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - "sns:Publish"
+                - "route53:GetChange"
+                - "route53:ChangeResourceRecordSets"
+                - "acm:ImportCertificate"
+                - "acm:DescribeCertificate"
+              Resource:
+                - !Sub "arn:aws:sns:${Region}:${AWSAccount}:*"
+                - !Sub "arn:aws:route53:::hostedzone/${HostedZoneId}"
+                - "arn:aws:route53:::change/*"
+                - "arn:aws:acm:${Region}:${AWSAccount}:certificate/*"
+            - Effect: Allow
+              Action:
+                - "s3:GetObject"
+                - "s3:ListBucket"
+                - "s3:PutObject"
+                - "s3:DeleteObject"
+              Resource:
+                - !Ref PrivateBucket
+###############################################################################
+Outputs:
+###############################################################################
+  CertUpdateLambdaRoleOutput:
+    Description: A Reference to the Lambda Role to use to update certs
+    Value: !Ref GlueCrawlerRole
+    Export:
+      Name: !Sub "${AWS::StackName}-Name"
+  CertUpdateLamdaRoleARN:
+    Description: The arn of the ETLRole
+    Value: {"Fn::GetAtt" : [ "GlueCrawlerRole", "Arn" ] }
+    Export:
+      Name: !Sub "${AWS::StackName}-ARN"
+  
