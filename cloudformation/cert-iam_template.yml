@@ -1,24 +1,22 @@
 AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
 Description: >
   IAM ROLE for Lamda to auto-rotate Let's Encrypt ssl certificates
 
 ###############################################################################
 Parameters:
 ###############################################################################
-
   Region:
     Type: String
     Description: The Region To Deploy To
   AWSAccount:
     Type: String
     Description: The account ID this will be deployed in
-  HostedZoneID:
-    Description: 'The ID of your hosted zone in Route 53'
-    Type: 'AWS::Route53::HostedZone::Id'     
+    Type: String     
   PrivateBucket:
     Type: String
     Description: The Bucket to hold our certificate
-  CertLambaRoleName:
+  CertLambdaRoleName:
     Type: String
     Description: The name to use for the Lambda Role
   
@@ -30,51 +28,70 @@ Resources:
   CertUpdateLambdaRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Ref CertLambdaRolename
+      RoleName: !Ref CertLambdaRoleName
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
-          -
-            Effect: "Allow"
+          - Action:
+            - 'sts:AssumeRole'
+            Effect: Allow
             Principal:
               Service:
-                - "lambda.amazonaws.com"
-            Action:
-              - "sts:AssumeRole"
-      Path: "/"
+                - lambda.amazonaws.com
       Policies:
-        - PolicyName: cert-lambda-execute-role
+        - PolicyName: cert-lambda-create-loggroup
           PolicyDocument:
-            Version: '2012-10-17'
+            Version: "2012-10-17"
             Statement:
             - Effect: Allow
               Action:
                 - "logs:CreateLogGroup"
               Resource: !Sub "arn:aws:logs:${Region}:${AWSAccount}:*"
+        - PolicyName: cert-lambda-put-logs
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
             - Effect: Allow
               Action:
                 - "logs:PutLogEvents"
                 - "logs:CreateLogStream"
-              Resource: "arn:aws:logs:${Region}:${AWSAccount}:log-group:/aws/lambda/acme-dns-route53:*"
+              Resource: 
+                 - "arn:aws:logs:*:*:*"
+ 
+        - PolicyName: cert-lambda-global
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+            - Effect: Allow
+              Action:
+                - "acm:ListCertificates"
+                - "cloudwatch:PutMetricData"
+                - "acm:ImportCertificate"
+                - "acm:DescribeCertificate"
+              Resource: "*"
+        - PolicyName: cert-lambda-route53
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
             - Effect: Allow
               Action:
                 - "route53:ListHostedZones"
-                - "acm:ImportCertificate"
-                - "acm:ListCertificates"
-                - "cloudwatch:PutMetricData"
-              Resource: "*"
+              Resource:
+              - "arn:aws:route53:::hostedzone/*"
+              - "arn:aws:route53:::change/*"
+        - PolicyName: cert-lambda-sns
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
             - Effect: Allow
               Action:
                 - "sns:Publish"
-                - "route53:GetChange"
-                - "route53:ChangeResourceRecordSets"
-                - "acm:ImportCertificate"
-                - "acm:DescribeCertificate"
               Resource:
                 - !Sub "arn:aws:sns:${Region}:${AWSAccount}:*"
-                - !Sub "arn:aws:route53:::hostedzone/${HostedZoneId}"
-                - "arn:aws:route53:::change/*"
-                - "arn:aws:acm:${Region}:${AWSAccount}:certificate/*"
+        - PolicyName: cert-lambda-private-s3
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
             - Effect: Allow
               Action:
                 - "s3:GetObject"
@@ -82,7 +99,8 @@ Resources:
                 - "s3:PutObject"
                 - "s3:DeleteObject"
               Resource:
-                - !Ref PrivateBucket
+                - !Sub "arn:aws:s3:::${PrivateBucket}"
+
 ###############################################################################
 Outputs:
 ###############################################################################

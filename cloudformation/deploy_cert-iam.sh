@@ -1,13 +1,13 @@
 #!/bin/sh
 
 ENVIRONMENT="dev"
-AWS_ACCOUNT_ID="<YOUR_ACCOUNT>"
+AWS_ACCOUNT_ID="<YOUR_AWS_ACCOUNT_ID>"
 CUSTOMER="atb"
 APP="web"
 MODULE="ssl"
 COMPONENT="cert-iam"
 REGION="us-east-1"
-HOSTED_ZONE_ID="Z04156561UJTD1JXFR76"
+HOSTED_ZONE_ID="<YOUR_HOSTED_ZONE>"
 
 STACK_NAME="${CUSTOMER}-${APP}-${MODULE}-${COMPONENT}-${ENVIRONMENT}"
 PRIVATE_BUCKET="${CUSTOMER}-${APP}-${MODULE}-private-${ENVIRONMENT}"
@@ -22,7 +22,7 @@ aws cloudformation deploy --stack-name $STACK_NAME --region $REGION --capabiliti
 	--parameter-overrides \
 	    Region=$REGION \
 	    EnvironmentName=$ENVIRONMENT \
-	    AWSAccount=AWS_ACCOUNT_ID \
+	    AWSAccount=$AWS_ACCOUNT_ID \
 	    PrivateBucket=$PRIVATE_BUCKET \
 	    HostedZoneID=$HOSTED_ZONE_ID \
-	    CertLambaRoleName=$CERT_LAMBDA_ROLE
+	    CertLambdaRoleName=$CERT_LAMBDA_ROLE
