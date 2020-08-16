@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >
+  This template deploys S3 buckets for SSL certificate storage
+
+##########################################################
+Parameters:
+##########################################################
+
+  PrivateBucket:
+    Description: A place for private files that should not be viewed or served outside
+    Type: String
+
+##########################################################
+Resources:
+##########################################################
+
+  PrivateContentBucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:    
+      BucketName: !Ref PrivateBucket
+      AccessControl: Private      
+      VersioningConfiguration:
+        Status: Enabled
+    DeletionPolicy: Retain
+
+######################################################
+Outputs:
+######################################################
+  BucketName:
+    Description: A Reference to the private bucket for storing certs
+    Value: !Ref Bucket
+    Export:
+      Name: !Sub "${AWS::StackName}-Name"
+  BucketARN:
+    Description: The arn of the bucket for certs
+    Value: {"Fn::GetAtt" : [ "Bucket", "Arn" ] }
+    Export:
+      Name: !Sub "${AWS::StackName}-ARN"

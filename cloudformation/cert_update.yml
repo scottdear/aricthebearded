@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >
+  IAM ROLE for Lamda to auto-rotate Let's Encrypt ssl certificates
+
+###############################################################################
+Parameters:
+###############################################################################
+
+  PrivateBucket:
+    Type: String
+    Description: The Bucket to hold our certificate
+  ParentIAMStack:
+    Type: String
+    Description: Stackname of IAM role to use
+  ScriptBucket:
+    Type: String
+    Description: The private bucket
+  ScriptPrefix:
+    Type: String
+    Description: The prefix where the zip file is stored
+  
+
+###############################################################################
+Resources:
+###############################################################################
+
+  CertUpdateFunction:
+    Type: "AWS::Serverless::Function"
+    Properties:
+      Description: Serverless function to update SSL certificates
+      CodeUri: 
+        Bucket: !Ref ScriptBucket
+        Key: !Sub "${ScriptPrefix}/acme-dns-route53.zip"
+      FunctionName: !Sub "cert_update-${EnvironmentName}"
+      Handler: "acme-dns-route53"
+      MemorySize: 1024
+      Runtime: go1.x
+      Timeout: 900
+      Environment:
+        Variables:
+          DEBUG: !Ref Debug
+          AWS_LAMBDA: "1"
+          ENV_NAME: !Ref EnvironmentName
+          REGION: us-east-1
+      Role: {'Fn::ImportValue': {'Fn::Sub' : '${ParentIAMStack}-ARN'}}
+
+###############################################################################
+Outputs:
+###############################################################################
+  CertUpdateFunctionRoleOutput:
+    Description: A Reference to the function to use to update certs
+    Value: !Ref CertUpdateFunction
+    Export:
+      Name: !Sub "${AWS::StackName}-Name"
+  CertUpdateFunctionRoleARN:
+    Description: The arn of the Cert Update Function
+    Value: {"Fn::GetAtt" : [ "CertUpdateFunction", "Arn" ] }
+    Export:
+      Name: !Sub "${AWS::StackName}-ARN"
+  

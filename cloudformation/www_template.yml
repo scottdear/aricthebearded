@@ -15,7 +15,7 @@ Parameters:
   HostedZoneID:
     Description: 'The ID of your hosted zone in Route 53'
     Type: 'AWS::Route53::HostedZone::Id'
-
+  
   PriceClass:
     Type: String
     Description: The CloudFront distribution price class
@@ -120,3 +120,17 @@ Resources:
       AliasTarget:
         HostedZoneId: Z2FDTNDATAQYW2 # This Zone ID is used for any CloudFront Distribution
         DNSName: !GetAtt 'CloudFrontDistribution.DomainName'
+
+###############################################################################
+Outputs:
+###############################################################################
+  BucketName:
+    Description: A Reference to the Lambda Role to use to update certs
+    Value: !Ref Bucket
+    Export:
+      Name: !Sub "${AWS::StackName}-Name"
+  BucketARN:
+    Description: The arn of the Lambda Role for the update cert function
+    Value: {"Fn::GetAtt" : [ "Bucket", "Arn" ] }
+    Export:
+      Name: !Sub "${AWS::StackName}-ARN"

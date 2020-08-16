@@ -88,12 +88,12 @@ Outputs:
 ###############################################################################
   CertUpdateLambdaRoleOutput:
     Description: A Reference to the Lambda Role to use to update certs
-    Value: !Ref GlueCrawlerRole
+    Value: !Ref CertUpdateLambdaRole
     Export:
       Name: !Sub "${AWS::StackName}-Name"
   CertUpdateLamdaRoleARN:
     Description: The arn of the ETLRole
-    Value: {"Fn::GetAtt" : [ "GlueCrawlerRole", "Arn" ] }
+    Value: {"Fn::GetAtt" : [ "CertUpdateLambdaRole", "Arn" ] }
     Export:
       Name: !Sub "${AWS::StackName}-ARN"
   
