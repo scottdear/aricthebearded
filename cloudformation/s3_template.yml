@@ -28,11 +28,11 @@ Outputs:
 ######################################################
   BucketName:
     Description: A Reference to the private bucket for storing certs
-    Value: !Ref Bucket
+    Value: !Ref PrivateBucket
     Export:
       Name: !Sub "${AWS::StackName}-Name"
   BucketARN:
     Description: The arn of the bucket for certs
-    Value: {"Fn::GetAtt" : [ "Bucket", "Arn" ] }
+    Value: {"Fn::GetAtt" : [ "PrivateContentBucket", "Arn" ] }
     Export:
       Name: !Sub "${AWS::StackName}-ARN"

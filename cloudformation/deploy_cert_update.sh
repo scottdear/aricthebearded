@@ -23,7 +23,7 @@ zip -j acme-dns-route53.zip acme-dns-route53
 
 aws s3 cp acme-dns-route53.zip "s3://${PRIVATE_BUCKET}/${SCRIPT_PREFIX}/acme-dns-route53.zip"
 
-cd ../cloudformation
+cd ..
 
 aws cloudformation deploy --stack-name $STACK_NAME --region $REGION --capabilities CAPABILITY_NAMED_IAM \
 	--template-file  "${COMPONENT}_template.yml" --no-fail-on-empty-changeset \
