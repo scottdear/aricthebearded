@@ -1,11 +1,14 @@
 AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
 Description: >
   IAM ROLE for Lamda to auto-rotate Let's Encrypt ssl certificates
 
 ###############################################################################
 Parameters:
 ###############################################################################
-
+  EnvironmentName:
+    Type: String
+    Description: environment, development, production, qa, etc.
   PrivateBucket:
     Type: String
     Description: The Bucket to hold our certificate
@@ -18,6 +21,13 @@ Parameters:
   ScriptPrefix:
     Type: String
     Description: The prefix where the zip file is stored
+  HostedZoneID:
+    Type: String
+    Description: The zone to update the cert on
+  Debug:
+    Type: String
+    Description: debug level
+    Default: "ERROR" # TODO: Add log level support
   
 
 ###############################################################################
