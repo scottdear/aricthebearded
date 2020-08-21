@@ -1,0 +1,55 @@
+body {
+  /* Location of the image */
+  background-image: url("../images/castle_back.jpg");
+  
+  /* Background image is centered vertically and horizontally at all times */
+  background-position: center center;
+  
+  /* Background image doesn't tile */
+  background-repeat: no-repeat;
+  
+  /* Background image is fixed in the viewport so that it doesn't move when 
+     the content's height is greater than the image's height */
+  background-attachment: fixed;
+  
+  /* This is what makes the background image rescale based
+     on the container's size */
+  background-size: cover;
+  
+  /* Set a background color that will be displayed
+     while the background image is loading */
+  background-color: #464646;
+}
+
+.mainbody {
+	margin:0;
+	width: 100%;
+	height:100vh;
+	text-align:center;
+}
+
+.mainfooter {
+	position: absolute;
+	bottom:10;
+	margin: 0 auto;
+	width: 100%;
+	text-align:center;
+}
+
+.maincontent {
+	 background-color: rgba(255, 255, 255, 0.5);
+	 width: 500px;
+	 height: 50%;
+	 margin: 0 auto;
+}
+.address-phone  {
+         background-color: rgba(255, 255, 255, 0.5);
+         width: 500px;
+         height: 30px;
+         margin: 0 auto;
+
+}
+
+.attrib-link {
+	padding-top: 20px;
+}
