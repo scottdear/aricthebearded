@@ -1379,7 +1379,7 @@ figcaption {
   border-color: #20399e;
   text-align: left;
   background-clip: border-box;
-  cursor: pointer;
+  cursor: default;
   -o-object-fit: contain;
   object-fit: contain;
 }
