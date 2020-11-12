@@ -1,0 +1,27 @@
+$(document).ready(function() {
+    if (!Modernizr.inputtypes.date) {
+        $(".dateinput").mask("99/99/9999");
+    }
+    $("form").on("submit", function(e) {
+        var block_submit = false;
+        var scroll_to = true;
+        $("form").find("input,select,textarea").each(function() {
+            if($(this).attr("required")) {
+                if ($(this).val() == "") {
+                    block_submit = true;
+                    $(this).css("border","2px solid red");
+                    if (scroll_to) {
+                        $('html, body').animate({ scrollTop: $(this).offset().top}, 1000);
+                        $(this).focus();
+                        scroll_to = false;
+                    }
+                } else {
+                    $(this).css("border","0px");
+                }
+            }
+        });
+        if (block_submit) {
+            e.preventDefault();
+        }
+    });
+});
