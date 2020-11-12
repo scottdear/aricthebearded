@@ -1,0 +1,19 @@
+.button-holder form {
+    display: inline-block;
+}
+
+.content-main .col-md-2, .content-main .col-md-10 {
+    padding-bottom: 30px;
+}
+
+fieldset {
+    width: 100%;
+}
+
+ul.list-unstyled {
+    padding-left: 20px;
+}
+
+ul.list-unstyled li {
+    margin: 8px;
+}
